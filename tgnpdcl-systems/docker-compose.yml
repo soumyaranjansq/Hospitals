@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: tgnpdcl_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  hospital-service:
+    build:
+      context: ./tgnpdcl-hospital-service
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./tgnpdcl-hospital-service:/app
+    ports:
+      - "8001:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=dev-secret
+      - DATABASE_URL=postgres://postgres:password@db:5432/tgnpdcl_db
+    depends_on:
+      - db
+
+  workflow-service:
+    build:
+      context: ./tgnpdcl-workflow-service
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./tgnpdcl-workflow-service:/app
+    ports:
+      - "8002:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=dev-secret
+      - DATABASE_URL=postgres://postgres:password@db:5432/tgnpdcl_db
+    depends_on:
+      - db
+
+  document-service:
+    build:
+      context: ./tgnpdcl-document-service
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./tgnpdcl-document-service:/app
+      - ./uploads:/app/uploads
+    ports:
+      - "8003:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=dev-secret
+      - DATABASE_URL=postgres://postgres:password@db:5432/tgnpdcl_db
+    depends_on:
+      - db
+
+  notification-service:
+    build:
+      context: ./tgnpdcl-notification-service
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+      - rabbitmq
+
+volumes:
+  postgres_data:
