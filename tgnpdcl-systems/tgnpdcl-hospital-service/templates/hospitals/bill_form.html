@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Submit New Medical Bill</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Hospital</label>
+                            {{ form.hospital }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Bill Number</label>
+                            {{ form.bill_number }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Patient Name</label>
+                        {{ form.patient_name }}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Admission Date</label>
+                            {{ form.admission_date }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Discharge Date</label>
+                            {{ form.discharge_date }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Bill Date</label>
+                            {{ form.bill_date }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Gross Total</label>
+                            {{ form.gross_total }}
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Submit Bill</button>
+                        <a href="{% url 'bill_list' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

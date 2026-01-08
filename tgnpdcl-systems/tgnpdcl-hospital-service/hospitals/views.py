@@ -1,46 +1,42 @@
-from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from .models import Bill, LineItem, Hospital
-from .serializers import BillSerializer, LineItemSerializer, HospitalSerializer
+from django.shortcuts import render, redirect
+from django.views.generic import ListView, CreateView, TemplateView
+from rest_framework import viewsets
+from .models import Hospital, Bill
+from .serializers import HospitalSerializer, BillSerializer
+from .forms import BillForm
+from django.urls import reverse_lazy
+
+# DRF Viewsets
+class HospitalViewSet(viewsets.ModelViewSet):
+    queryset = Hospital.objects.all()
+    serializer_class = HospitalSerializer
 
 class BillViewSet(viewsets.ModelViewSet):
     queryset = Bill.objects.all()
     serializer_class = BillSerializer
-    permission_classes = [permissions.IsAuthenticated]
+
+# Frontend Views
+class BillListView(ListView):
+    model = Bill
+    template_name = 'hospitals/bill_list.html'
+    context_object_name = 'bills'
+    ordering = ['-submission_date']
 
     def get_queryset(self):
-        # Only show bills for the logged-in hospital
-        if hasattr(self.request.user, 'hospital'):
-            return Bill.objects.filter(hospital=self.request.user.hospital)
-        return Bill.objects.none()
+        # Determine the status to filter by from GET params or default to showing all
+        status = self.request.GET.get('status')
+        queryset = super().get_queryset()
+        if status:
+            queryset = queryset.filter(status=status)
+        return queryset
 
-    def perform_create(self, serializer):
-        # Auto-assign the hospital from the logged-in user
-        if hasattr(self.request.user, 'hospital'):
-            serializer.save(hospital=self.request.user.hospital)
+class BillCreateView(CreateView):
+    model = Bill
+    form_class = BillForm
+    template_name = 'hospitals/bill_form.html'
+    success_url = reverse_lazy('bill_list')
 
-    @action(detail=True, methods=['post'])
-    def submit(self, request, pk=None):
-        bill = self.get_object()
-        if bill.status != 'DRAFT':
-            return Response({'error': 'Only draft bills can be submitted'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Here we would trigger validation and workflow start
-        # For now just update status
-        from django.utils import timezone
-        bill.status = 'SUBMITTED'
-        bill.submission_date = timezone.now()
-        bill.save()
-        return Response({'status': 'Bill submitted successfully'})
-
-class LineItemViewSet(viewsets.ModelViewSet):
-    queryset = LineItem.objects.all()
-    serializer_class = LineItemSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        if hasattr(self.request.user, 'hospital'):
-            return LineItem.objects.filter(bill__hospital=self.request.user.hospital)
-        return LineItem.objects.none()
+    def form_valid(self, form):
+        # Set default status or perform other logic
+        form.instance.status = 'SUBMITTED'
+        return super().form_valid(form)
