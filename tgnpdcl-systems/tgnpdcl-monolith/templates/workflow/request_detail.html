@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Review Request - SR-{{ sanction_request.id }}{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span class="sidebar-logo-icon">⚡</span>
+            <span class="sidebar-logo-text">TGNPDCL</span>
+        </div>
+        <nav>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="{% url 'dashboard' %}" class="sidebar-nav-link">📊 Dashboard</a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="{% url 'workflow:approval_queue' %}" class="sidebar-nav-link active">✅ Approval Queue</a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="{% url 'documents:document_list' %}" class="sidebar-nav-link">📁 Documents</a>
+                </li>
+            </ul>
+        </nav>
+        <div style="position: absolute; bottom: 1.5rem; left: 1.5rem; right: 1.5rem;">
+            <a href="{% url 'logout' %}" class="btn btn-secondary btn-block">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Review Request: SR-{{ sanction_request.id }}</h1>
+            <span class="badge badge-warning">{{ sanction_request.get_status_display }}</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+            <div>
+                <div class="card fade-in mb-6">
+                    <div class="card-header">
+                        <h3 style="font-size: 1.125rem;">Request Details</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <div>
+                                <p class="text-muted">Hospital</p>
+                                <p style="font-weight: 600;">{{ sanction_request.hospital_name }}</p>
+                            </div>
+                            <div>
+                                <p class="text-muted">Patient</p>
+                                <p style="font-weight: 600;">{{ sanction_request.patient_name }}</p>
+                            </div>
+                            <div>
+                                <p class="text-muted">Claimed Amount</p>
+                                <p style="font-size: 1.25rem; font-weight: 700; color: var(--primary-500);">₹{{
+                                    sanction_request.claimed_amount }}</p>
+                            </div>
+                            <div>
+                                <p class="text-muted">Current Step</p>
+                                <p>{{ sanction_request.current_step.name }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approval Actions -->
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <h3 style="font-size: 1.125rem;">Action Required</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="{% url 'workflow:process_request' sanction_request.id %}" method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label class="form-label">Approved Amount (Optional)</label>
+                                <input type="number" name="approved_amount" class="form-control"
+                                    placeholder="Enter amount to sanction" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Comments / Remarks</label>
+                                <textarea name="comments" class="form-control" rows="3"
+                                    placeholder="Enter your comments here..." required></textarea>
+                            </div>
+                            <div style="display: flex; gap: 1rem;">
+                                <button type="submit" name="action" value="FORWARD" class="btn btn-primary">Forward to
+                                    Next Level</button>
+                                <button type="submit" name="action" value="APPROVE" class="btn btn-primary"
+                                    style="background: var(--success-500);">Approve Final</button>
+                                <button type="submit" name="action" value="REJECT" class="btn btn-secondary"
+                                    style="background: var(--error-500); color: white;">Reject</button>
+                                <button type="submit" name="action" value="CLARIFY" class="btn btn-secondary">Seek
+                                    Clarification</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Log -->
+                <h3 style="font-size: 1.125rem; margin-top: 2rem; margin-bottom: 1rem;">Approval History</h3>
+                {% for log in logs %}
+                <div class="card mb-4" style="background: rgba(255,255,255,0.02);">
+                    <div class="card-body" style="padding: 1rem;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <strong>{{ log.user.get_full_name|default:log.user.username }}</strong>
+                            <span class="text-muted" style="font-size: 0.8rem;">{{ log.timestamp }}</span>
+                        </div>
+                        <div style="margin-top: 0.5rem;">
+                            <span class="badge badge-info">{{ log.get_action_display }}</span>
+                            <span style="margin-left: 0.5rem;">{{ log.comments }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted">No history available.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Documents -->
+            <div class="card fade-in">
+                <div class="card-header">
+                    <h3 style="font-size: 1.125rem;">📄 Bill Documents (S3)</h3>
+                </div>
+                <div class="card-body">
+                    {% if bill_documents %}
+                    {% for doc in bill_documents %}
+                    <div class="document-card mb-4">
+                        <div class="document-name">{{ doc.get_doc_type_display }}</div>
+                        <div style="margin-top: 0.5rem;">
+                            <a href="{{ doc.file.url }}" class="btn btn-secondary btn-block" style="font-size: 0.75rem;"
+                                target="_blank">View File</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted text-center">No documents found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

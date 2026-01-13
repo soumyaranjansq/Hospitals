@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hospital Dashboard - TGNPDCL{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span class="sidebar-logo-icon">⚡</span>
+            <span class="sidebar-logo-text">TGNPDCL</span>
+        </div>
+
+        <nav>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="{% url 'dashboard' %}" class="sidebar-nav-link">📊 Dashboard</a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="{% url 'hospitals:dashboard' %}" class="sidebar-nav-link active">🏥 Hospital</a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="{% url 'hospitals:bill_list' %}" class="sidebar-nav-link">📄 Bills</a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="{% url 'documents:document_list' %}" class="sidebar-nav-link">📁 Documents</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div style="position: absolute; bottom: 1.5rem; left: 1.5rem; right: 1.5rem;">
+            <a href="{% url 'logout' %}" class="btn btn-secondary btn-block">🚪 Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <h1 class="page-title">🏥 {{ hospital.name }}</h1>
+                <span class="badge badge-info">{{ hospital.get_tier_display }}</span>
+            </div>
+            <a href="{% url 'hospitals:submit_bill' %}" class="btn btn-primary">➕ Submit New Bill</a>
+        </div>
+
+        <div class="card fade-in mb-6">
+            <div class="card-body">
+                <h3 style="margin-bottom: 1rem;">Hospital Details</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div>
+                        <div class="text-muted" style="font-size: 0.8125rem;">Code</div>
+                        <div style="font-weight: 500;">{{ hospital.code }}</div>
+                    </div>
+                    <div>
+                        <div class="text-muted" style="font-size: 0.8125rem;">Tier</div>
+                        <div style="font-weight: 500;">{{ hospital.get_tier_display }}</div>
+                    </div>
+                    <div>
+                        <div class="text-muted" style="font-size: 0.8125rem;">Address</div>
+                        <div style="font-weight: 500;">{{ hospital.address }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card fade-in">
+            <div class="card-header">
+                <h3 style="font-size: 1.125rem;">Recent Bills</h3>
+            </div>
+            <div class="card-body">
+                {% if bills %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Bill No.</th>
+                                <th>Patient</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bill in bills %}
+                            <tr>
+                                <td>{{ bill.bill_number }}</td>
+                                <td>{{ bill.patient_name }}</td>
+                                <td>₹{{ bill.gross_total }}</td>
+                                <td><span class="badge badge-{{ bill.status|lower }}">{{ bill.get_status_display
+                                        }}</span></td>
+                                <td>{{ bill.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted" style="padding: 3rem;">
+                    <span style="font-size: 3rem; opacity: 0.5;">📄</span>
+                    <p style="margin-top: 1rem;">No bills submitted yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
