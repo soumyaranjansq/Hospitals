@@ -98,6 +98,7 @@ class ApprovalLog(models.Model):
     ACTION_CHOICES = (
         ('FORWARD', 'Forward'),
         ('REJECT', 'Reject'),
+        ('REJECT_RECOMMENDED', 'Submitted for Rejection'),
         ('APPROVE', 'Approve (Final)'),
         ('CLARIFY', 'Seek Clarification'),
         ('RESPOND', 'Respond to Clarification'),

@@ -5,180 +5,222 @@
 
 {% block extra_css %}
 <style>
-    :root {
-        --accent-color: {
-                {
-                role_config.color|default: "#3b82f6"
-            }
-        }
+ :root {
+ --accent-color: {
+ {
+ role_config.color|default: "#3b82f6"
+ }
+ }
 
-        ;
-    }
+ ;
+ }
 
-    .sidebar-logo-icon {
-        color: var(--accent-color);
-    }
+ .sidebar-logo-icon {
+ color: var(--accent-color);
+ }
 
-    .user-badge {
-        background: linear-gradient(135deg, {
-                {
-                role_config.color|default:"#3b82f6"
-            }
-        }
+ .user-badge {
+ background: linear-gradient(135deg, {
+ {
+ role_config.color|default:"#3b82f6"
+ }
+ }
 
-        30 0%, {
-            {
-            role_config.color|default:"#3b82f6"
-        }
-    }
+ 30 0%, {
+ {
+ role_config.color|default:"#3b82f6"
+ }
+ }
 
-    15 100%);
+ 15 100%);
 
-    border: 1px solid {
-            {
-            role_config.color|default: "#3b82f6"
-        }
-    }
+ border: 1px solid {
+ {
+ role_config.color|default: "#3b82f6"
+ }
+ }
 
-    40;
-    }
+ 40;
+ }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <span class="sidebar-logo-icon">⚡</span>
-            <span class="sidebar-logo-text">TGNPDCL</span>
-        </div>
+ <!-- Sidebar -->
+ <aside class="sidebar">
+ <div class="sidebar-logo">
+ <span class="sidebar-logo-icon">⚡</span>
+ <span class="sidebar-logo-text">TGNPDCL</span>
+ </div>
 
-        <!-- User Info -->
-        <div class="user-badge" style="padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <span style="font-size: 2rem;">{{ role_config.icon }}</span>
-                <div>
-                    <div style="font-weight: 600; color: var(--gray-100);">
-                        {{ user.get_full_name|default:user.username }}
-                    </div>
-                    <div style="font-size: 0.8125rem; color: var(--gray-400);">
-                        {{ role_config.name }}
-                    </div>
-                </div>
-            </div>
-        </div>
+ <!-- User Info -->
+ <div class="user-badge" style="padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+ <div style="display: flex; align-items: center; gap: 0.75rem;">
+ <span style="font-size: 2rem;">{{ role_config.icon }}</span>
+ <div>
+ <div style="font-weight: 600; color: var(--gray-100);">
+ {{ user.get_full_name|default:user.username }}
+ </div>
+ <div style="font-size: 0.8125rem; color: var(--gray-400);">
+ {{ role_config.name }}
+ </div>
+ </div>
+ </div>
+ </div>
 
-        <!-- Navigation -->
-        <nav>
-            <ul class="sidebar-nav">
-                <li class="sidebar-nav-item">
-                    <a href="{% url 'dashboard' %}" class="sidebar-nav-link active">
-                        📊 Dashboard
-                    </a>
-                </li>
+ <!-- Navigation -->
+ <nav>
+ <ul class="sidebar-nav">
+ <li class="sidebar-nav-item">
+ <a href="{% url 'dashboard' %}" class="sidebar-nav-link active">
+ 📊 Dashboard
+ </a>
+ </li>
 
-                {% if profile.role == 'HOSPITAL' %}
-                <li class="sidebar-nav-item">
-                    <a href="{% url 'hospitals:dashboard' %}" class="sidebar-nav-link">
-                        🏥 Hospital
-                    </a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="{% url 'hospitals:bill_list' %}" class="sidebar-nav-link">
-                        📄 Bills
-                    </a>
-                </li>
-                {% else %}
-                <li class="sidebar-nav-item">
-                    <a href="{% url 'workflow:approval_queue' %}" class="sidebar-nav-link">
-                        ✅ Approval Queue
-                    </a>
-                </li>
-                {% endif %}
+ {% if profile.role == 'HOSPITAL' %}
+ <li class="sidebar-nav-item">
+ <a href="{% url 'hospitals:dashboard' %}" class="sidebar-nav-link">
+ 🏥 Hospital
+ </a>
+ </li>
+ <li class="sidebar-nav-item">
+ <a href="{% url 'hospitals:bill_list' %}" class="sidebar-nav-link">
+ 📄 Bills
+ </a>
+ </li>
+ {% else %}
+ <li class="sidebar-nav-item">
+ <a href="{% url 'workflow:approval_queue' %}" class="sidebar-nav-link">
+ ✅ Approval Queue
+ </a>
+ </li>
+ {% endif %}
 
-                <li class="sidebar-nav-item">
-                    <a href="{% url 'documents:document_list' %}" class="sidebar-nav-link">
-                        📁 Documents
-                    </a>
-                </li>
-            </ul>
-        </nav>
+ <li class="sidebar-nav-item">
+ <a href="{% url 'documents:document_list' %}" class="sidebar-nav-link">
+ 📁 Documents
+ </a>
+ </li>
+ </ul>
+ </nav>
 
-        <!-- Logout -->
-        <div style="position: absolute; bottom: 1.5rem; left: 1.5rem; right: 1.5rem;">
-            <a href="{% url 'logout' %}" class="btn btn-secondary btn-block" style="justify-content: flex-start;">
-                🚪 Logout
-            </a>
-        </div>
-    </aside>
+ <!-- Logout -->
+ <div style="position: absolute; bottom: 1.5rem; left: 1.5rem; right: 1.5rem;">
+ <a href="{% url 'logout' %}" class="btn btn-secondary btn-block" style="justify-content: flex-start;">
+ 🚪 Logout
+ </a>
+ </div>
+ </aside>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="page-header">
-            <h1 class="page-title">Dashboard</h1>
-            <span class="badge badge-info">{{ profile.get_role_display }}</span>
-        </div>
+ <!-- Main Content -->
+ <main class="main-content">
+ <div class="page-header">
+ <h1 class="page-title">Dashboard</h1>
+ <span class="badge badge-info">{{ profile.get_role_display }}</span>
+ </div>
 
-        <!-- Welcome Card -->
-        <div class="card mb-6 fade-in">
-            <div class="card-body" style="padding: 2rem;">
-                <h2 style="margin-bottom: 0.5rem;">Welcome, {{ user.get_full_name|default:user.username }}!</h2>
-                <p class="text-muted">
-                    You are logged in as <strong>{{ role_config.name }}</strong>.
-                    Use the sidebar to navigate through the system.
-                </p>
-            </div>
-        </div>
+ <!-- Welcome Card -->
+ <div class="card mb-6 fade-in">
+ <div class="card-body" style="padding: 2rem;">
+ <h2 style="margin-bottom: 0.5rem;">Welcome, {{ user.get_full_name|default:user.username }}!</h2>
+ <p class="text-muted">
+ You are logged in as <strong>{{ role_config.name }}</strong>.
+ Use the sidebar to navigate through the system.
+ </p>
+ </div>
+ </div>
 
-        <!-- Documents Section (S3 Files) -->
-        <div class="card fade-in" style="animation-delay: 0.1s;">
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="font-size: 1.125rem;">📁 Recent Documents (S3)</h3>
-                <a href="{% url 'documents:document_list' %}" class="btn btn-secondary"
-                    style="font-size: 0.875rem; padding: 0.5rem 1rem;">
-                    View All
-                </a>
-            </div>
-            <div class="card-body">
-                {% if documents %}
-                <div class="documents-grid">
-                    {% for doc in documents %}
-                    <div class="document-card">
-                        <div class="document-icon">
-                            {% if doc.content_type == 'application/pdf' %}
-                            📕
-                            {% elif 'image' in doc.content_type %}
-                            🖼️
-                            {% elif 'word' in doc.content_type or doc.content_type == 'application/msword' %}
-                            📘
-                            {% elif 'excel' in doc.content_type or 'spreadsheet' in doc.content_type %}
-                            📗
-                            {% else %}
-                            📄
-                            {% endif %}
-                        </div>
-                        <div class="document-name">{{ doc.original_filename }}</div>
-                        <div class="document-meta">
-                            {{ doc.file_size_display }} • {{ doc.uploaded_at|date:"M d, Y" }}
-                        </div>
-                        <div style="margin-top: 0.75rem;">
-                            <a href="{% url 'documents:document_view' doc.id %}" class="btn btn-secondary"
-                                style="font-size: 0.75rem; padding: 0.375rem 0.75rem;" target="_blank">
-                                View / Download
-                            </a>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="text-center text-muted" style="padding: 3rem;">
-                    <span style="font-size: 3rem; opacity: 0.5;">📭</span>
-                    <p style="margin-top: 1rem;">No documents uploaded yet.</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </main>
+ {% if profile.role != 'HOSPITAL' and processed_logs %}
+ <!-- Recently Processed Section (for Officers) -->
+ <div class="card mb-6 fade-in" style="animation-delay: 0.05s;">
+ <div class="card-header">
+ <h3 style="font-size: 1.125rem;">✅ Recently Processed</h3>
+ </div>
+ <div class="card-body">
+ <div class="table-responsive">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>ID</th>
+ <th>Hospital</th>
+ <th>Patient</th>
+ <th>Action</th>
+ <th>Stage</th>
+ <th>Date</th>
+ </tr>
+ </thead>
+ <tbody>
+ {% for log in processed_logs %}
+ <tr>
+ <td>SR-{{ log.request.id }}</td>
+ <td>{{ log.request.hospital_name }}</td>
+ <td>{{ log.request.patient_name }}</td>
+ <td>
+ <span class="badge badge-info" style="font-size: 0.75rem;">
+ {{ log.get_action_display }}
+ </span>
+ </td>
+ <td><span class="text-muted" style="font-size: 0.8125rem;">{{ log.step.name }}</span>
+ </td>
+ <td>{{ log.timestamp|date:"M d, H:i" }}</td>
+ </tr>
+ {% endfor %}
+ </tbody>
+ </table>
+ </div>
+ </div>
+ </div>
+ {% endif %}
+
+ <!-- Documents Section (S3 Files) -->
+ <div class="card fade-in" style="animation-delay: 0.1s;">
+ <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+ <h3 style="font-size: 1.125rem;">📁 Recent Documents (S3)</h3>
+ <a href="{% url 'documents:document_list' %}" class="btn btn-secondary"
+ style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+ View All
+ </a>
+ </div>
+ <div class="card-body">
+ {% if documents %}
+ <div class="documents-grid">
+ {% for doc in documents %}
+ <div class="document-card">
+ <div class="document-icon">
+ {% if doc.content_type == 'application/pdf' %}
+ 📕
+ {% elif 'image' in doc.content_type %}
+ 🖼️
+ {% elif 'word' in doc.content_type or doc.content_type == 'application/msword' %}
+ 📘
+ {% elif 'excel' in doc.content_type or 'spreadsheet' in doc.content_type %}
+ 📗
+ {% else %}
+ 📄
+ {% endif %}
+ </div>
+ <div class="document-name">{{ doc.original_filename }}</div>
+ <div class="document-meta">
+ {{ doc.file_size_display }} • {{ doc.uploaded_at|date:"M d, Y" }}
+ </div>
+ <div style="margin-top: 0.75rem;">
+ <a href="{% url 'documents:document_view' doc.id %}" class="btn btn-secondary"
+ style="font-size: 0.75rem; padding: 0.375rem 0.75rem;" target="_blank">
+ View / Download
+ </a>
+ </div>
+ </div>
+ {% endfor %}
+ </div>
+ {% else %}
+ <div class="text-center text-muted" style="padding: 3rem;">
+ <span style="font-size: 3rem; opacity: 0.5;">📭</span>
+ <p style="margin-top: 1rem;">No documents uploaded yet.</p>
+ </div>
+ {% endif %}
+ </div>
+ </div>
+ </main>
 </div>
 {% endblock %}

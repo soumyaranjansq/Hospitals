@@ -42,6 +42,21 @@ class Service(models.Model):
         return f"{self.name} ({self.code})"
 
 
+class Scheme(models.Model):
+    """Reimbursement scheme (e.g., EHS, Pensioners)."""
+    
+    name = models.CharField(max_length=255)
+    code = models.CharField(max_length=50, unique=True)
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        ordering = ['name']
+        
+    def __str__(self):
+        return self.name
+
+
 class Bill(models.Model):
     """Medical bill submitted by hospital."""
     
@@ -55,6 +70,7 @@ class Bill(models.Model):
     )
     
     hospital = models.ForeignKey(Hospital, on_delete=models.PROTECT, related_name='bills')
+    scheme = models.ForeignKey(Scheme, on_delete=models.PROTECT, related_name='bills', null=True, blank=True)
     patient_name = models.CharField(max_length=255)
     employee_id = models.CharField(max_length=50, blank=True)
     admission_date = models.DateField()

@@ -8,6 +8,7 @@ from .forms import RoleBasedLoginForm, UserRegistrationForm
 from .models import UserProfile
 from .decorators import role_required
 from documents.models import Document
+from workflow.models import ApprovalLog
 
 
 # Role configurations for each login page
@@ -149,12 +150,16 @@ def dashboard(request):
         return redirect('workflow:customer_admin_allocation')
     
     # Get all documents (S3 files)
-    documents = Document.objects.all().order_by('-uploaded_at')[:50]
+    documents = Document.objects.all().order_by('-uploaded_at')[:10]
+    
+    # Get recently processed requests by this user
+    processed_logs = ApprovalLog.objects.filter(user=request.user).select_related('request', 'step').order_by('-timestamp')[:5]
     
     context = {
         'profile': profile,
         'role_config': role_config,
         'documents': documents,
+        'processed_logs': processed_logs,
     }
     
     return render(request, 'dashboard/dashboard.html', context)

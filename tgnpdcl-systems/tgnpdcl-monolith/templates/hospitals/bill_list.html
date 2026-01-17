@@ -5,81 +5,83 @@
 
 {% block content %}
 <div class="dashboard">
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <span class="sidebar-logo-icon">⚡</span>
-            <span class="sidebar-logo-text">TGNPDCL</span>
-        </div>
-        <nav>
-            <ul class="sidebar-nav">
-                <li class="sidebar-nav-item">
-                    <a href="{% url 'dashboard' %}" class="sidebar-nav-link">📊 Dashboard</a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="{% url 'hospitals:dashboard' %}" class="sidebar-nav-link">🏥 Hospital</a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="{% url 'hospitals:bill_list' %}" class="sidebar-nav-link active">📄 Bills</a>
-                </li>
-                <li class="sidebar-nav-item">
-                    <a href="{% url 'documents:document_list' %}" class="sidebar-nav-link">📁 Documents</a>
-                </li>
-            </ul>
-        </nav>
-        <div style="position: absolute; bottom: 1.5rem; left: 1.5rem; right: 1.5rem;">
-            <a href="{% url 'logout' %}" class="btn btn-secondary btn-block">🚪 Logout</a>
-        </div>
-    </aside>
+ <aside class="sidebar">
+ <div class="sidebar-logo">
+ <span class="sidebar-logo-icon">⚡</span>
+ <span class="sidebar-logo-text">TGNPDCL</span>
+ </div>
+ <nav>
+ <ul class="sidebar-nav">
+ <li class="sidebar-nav-item">
+ <a href="{% url 'dashboard' %}" class="sidebar-nav-link">📊 Dashboard</a>
+ </li>
+ <li class="sidebar-nav-item">
+ <a href="{% url 'hospitals:dashboard' %}" class="sidebar-nav-link">🏥 Hospital</a>
+ </li>
+ <li class="sidebar-nav-item">
+ <a href="{% url 'hospitals:bill_list' %}" class="sidebar-nav-link active">📄 Bills</a>
+ </li>
+ <li class="sidebar-nav-item">
+ <a href="{% url 'documents:document_list' %}" class="sidebar-nav-link">📁 Documents</a>
+ </li>
+ </ul>
+ </nav>
+ <div style="position: absolute; bottom: 1.5rem; left: 1.5rem; right: 1.5rem;">
+ <a href="{% url 'logout' %}" class="btn btn-secondary btn-block">🚪 Logout</a>
+ </div>
+ </aside>
 
-    <main class="main-content">
-        <div class="page-header">
-            <h1 class="page-title">📄 All Bills</h1>
-            <span class="badge badge-info">{{ bills.count }} Total</span>
-        </div>
+ <main class="main-content">
+ <div class="page-header">
+ <h1 class="page-title">📄 All Bills</h1>
+ <span class="badge badge-info">{{ bills.count }} Total</span>
+ </div>
 
-        <div class="card fade-in">
-            <div class="card-body">
-                {% if bills %}
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Bill Number</th>
-                                <th>Patient Name</th>
-                                <th>Admission Date</th>
-                                <th>Total Amount</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for bill in bills %}
-                            <tr>
-                                <td>{{ bill.bill_number }}</td>
-                                <td>{{ bill.patient_name }}</td>
-                                <td>{{ bill.admission_date }}</td>
-                                <td>₹{{ bill.gross_total }}</td>
-                                <td><span class="badge badge-{{ bill.status|lower }}">{{ bill.get_status_display
-                                        }}</span></td>
-                                <td>
-                                    <a href="{% url 'hospitals:bill_detail' bill.id %}" class="btn btn-secondary"
-                                        style="font-size: 0.8125rem; padding: 0.4rem 0.75rem;">
-                                        View Details
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="text-center text-muted" style="padding: 4rem;">
-                    <span style="font-size: 4rem; opacity: 0.5;">📄</span>
-                    <p style="margin-top: 1rem;">No bills found for this hospital.</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </main>
+ <div class="card fade-in">
+ <div class="card-body">
+ {% if bills %}
+ <div class="table-responsive">
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Bill Number</th>
+ <th>Scheme</th>
+ <th>Patient Name</th>
+ <th>Admission Date</th>
+ <th>Total Amount</th>
+ <th>Status</th>
+ <th>Actions</th>
+ </tr>
+ </thead>
+ <tbody>
+ {% for bill in bills %}
+ <tr>
+ <td>{{ bill.bill_number }}</td>
+ <td>{% if bill.scheme %}<span class="badge badge-info" style="font-size: 0.7rem;">{{ bill.scheme.code }}</span>{% else %}<span class="text-muted">-</span>{% endif %}
+ </td>
+ <td>{{ bill.patient_name }}</td>
+ <td>{{ bill.admission_date }}</td>
+ <td>₹{{ bill.gross_total }}</td>
+ <td><span class="badge badge-{{ bill.status|lower }}">{{ bill.get_status_display }}</span></td>
+ <td>
+ <a href="{% url 'hospitals:bill_detail' bill.id %}" class="btn btn-secondary"
+ style="font-size: 0.8125rem; padding: 0.4rem 0.75rem;">
+ View Details
+ </a>
+ </td>
+ </tr>
+ {% endfor %}
+ </tbody>
+ </table>
+ </div>
+ {% else %}
+ <div class="text-center text-muted" style="padding: 4rem;">
+ <span style="font-size: 4rem; opacity: 0.5;">📄</span>
+ <p style="margin-top: 1rem;">No bills found for this hospital.</p>
+ </div>
+ {% endif %}
+ </div>
+ </div>
+ </main>
 </div>
 {% endblock %}

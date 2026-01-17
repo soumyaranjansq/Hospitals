@@ -5,173 +5,173 @@
 
 {% block content %}
 <div class="dashboard">
-    <aside class="sidebar">
-        <!-- Sidebar content same as dashboard for consistency -->
-        <div class="sidebar-logo">
-            <span class="sidebar-logo-icon">⚡</span>
-            <span class="sidebar-logo-text">TGNPDCL</span>
-        </div>
-        <nav>
-            <ul class="sidebar-nav">
-                <li class="sidebar-nav-item"><a href="{% url 'dashboard' %}" class="sidebar-nav-link">📊 Dashboard</a>
-                </li>
-                <li class="sidebar-nav-item"><a href="{% url 'hospitals:dashboard' %}"
-                        class="sidebar-nav-link active">🏥 Hospital</a></li>
-                <li class="sidebar-nav-item"><a href="{% url 'hospitals:bill_list' %}" class="sidebar-nav-link">📄
-                        Bills</a></li>
-                <li class="sidebar-nav-item"><a href="{% url 'documents:document_list' %}" class="sidebar-nav-link">📁
-                        Documents</a></li>
-            </ul>
-        </nav>
-    </aside>
+ <aside class="sidebar">
+ <!-- Sidebar content same as dashboard for consistency -->
+ <div class="sidebar-logo">
+ <span class="sidebar-logo-icon">⚡</span>
+ <span class="sidebar-logo-text">TGNPDCL</span>
+ </div>
+ <nav>
+ <ul class="sidebar-nav">
+ <li class="sidebar-nav-item"><a href="{% url 'dashboard' %}" class="sidebar-nav-link">📊 Dashboard</a>
+ </li>
+ <li class="sidebar-nav-item"><a href="{% url 'hospitals:dashboard' %}"
+ class="sidebar-nav-link active">🏥 Hospital</a></li>
+ <li class="sidebar-nav-item"><a href="{% url 'hospitals:bill_list' %}" class="sidebar-nav-link">📄
+ Bills</a></li>
+ <li class="sidebar-nav-item"><a href="{% url 'documents:document_list' %}" class="sidebar-nav-link">📁
+ Documents</a></li>
+ </ul>
+ </nav>
+ </aside>
 
-    <main class="main-content">
-        <div class="page-header">
-            <h1 class="page-title">📄 Submit New Reimbursement Bill</h1>
-        </div>
+ <main class="main-content">
+ <div class="page-header">
+ <h1 class="page-title">📄 Submit New Reimbursement Bill</h1>
+ </div>
 
-        <form method="post" enctype="multipart/form-data" class="fade-in">
-            {% csrf_token %}
+ <form method="post" enctype="multipart/form-data" class="fade-in">
+ {% csrf_token %}
 
-            <div class="grid grid-cols-2 gap-6">
-                <!-- Bill Details Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3>📌 Bill Information</h3>
-                    </div>
-                    <div class="card-body">
-                        {% for field in bill_form %}
-                        <div class="form-group">
-                            <label class="form-label">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.errors %}
-                            <div class="text-error" style="font-size: 0.8rem; margin-top: 5px;">{{ field.errors.0 }}
-                            </div>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
+ <div class="grid grid-cols-2 gap-6">
+ <!-- Bill Details Card -->
+ <div class="card">
+ <div class="card-header">
+ <h3>📌 Bill Information</h3>
+ </div>
+ <div class="card-body">
+ {% for field in bill_form %}
+ <div class="form-group">
+ <label class="form-label">{{ field.label }}</label>
+ {{ field }}
+ {% if field.errors %}
+ <div class="text-error" style="font-size: 0.8rem; margin-top: 5px;">{{ field.errors.0 }}
+ </div>
+ {% endif %}
+ </div>
+ {% endfor %}
+ </div>
+ </div>
 
-                <!-- Document Upload Card -->
-                <div class="card">
-                    <div class="card-header"
-                        style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3>📁 Attach Documents (S3)</h3>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <select id="billing-head-select" class="form-control" style="width: auto; height: 38px;">
-                                <option value="">-- Select Billing Head --</option>
-                                {% for service in services %}
-                                <option value="{{ service.id }}">{{ service.name }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="button" id="add-billing-head" class="btn btn-secondary"
-                                style="padding: 0.5rem 1rem;">Add</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        {{ formset.management_form }}
-                        <div id="formset-container">
-                            {% for form in formset %}
-                            <div class="formset-row"
-                                style="padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 1rem;">
-                                <div class="form-group">
-                                    <label class="form-label">Billing Head</label>
-                                    {{ form.service }}
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Document Type</label>
-                                    {{ form.doc_type }}
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">File</label>
-                                    {{ form.file }}
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
+ <!-- Document Upload Card -->
+ <div class="card">
+ <div class="card-header"
+ style="display: flex; justify-content: space-between; align-items: center;">
+ <h3>📁 Attach Documents (S3)</h3>
+ <div style="display: flex; gap: 0.5rem; align-items: center;">
+ <select id="billing-head-select" class="form-control" style="width: auto; height: 38px;">
+ <option value="">-- Select Billing Head --</option>
+ {% for service in services %}
+ <option value="{{ service.id }}">{{ service.name }}</option>
+ {% endfor %}
+ </select>
+ <button type="button" id="add-billing-head" class="btn btn-secondary"
+ style="padding: 0.5rem 1rem;">Add</button>
+ </div>
+ </div>
+ <div class="card-body">
+ {{ formset.management_form }}
+ <div id="formset-container">
+ {% for form in formset %}
+ <div class="formset-row"
+ style="padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 1rem;">
+ <div class="form-group">
+ <label class="form-label">Billing Head</label>
+ {{ form.service }}
+ </div>
+ <div class="form-group">
+ <label class="form-label">Document Type</label>
+ {{ form.doc_type }}
+ </div>
+ <div class="form-group">
+ <label class="form-label">File</label>
+ {{ form.file }}
+ </div>
+ </div>
+ {% endfor %}
+ </div>
 
-                        <!-- Template for empty form -->
-                        <div id="empty-form-template" style="display: none;">
-                            <div class="formset-row"
-                                style="padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 1rem;">
-                                <div class="form-group">
-                                    <label class="form-label">Billing Head</label>
-                                    {{ formset.empty_form.service }}
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Document Type</label>
-                                    {{ formset.empty_form.doc_type }}
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">File</label>
-                                    {{ formset.empty_form.file }}
-                                </div>
-                                <button type="button" class="btn btn-danger btn-sm remove-row"
-                                    style="margin-top: 0.5rem;">Remove</button>
-                            </div>
-                        </div>
+ <!-- Template for empty form -->
+ <div id="empty-form-template" style="display: none;">
+ <div class="formset-row"
+ style="padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 1rem;">
+ <div class="form-group">
+ <label class="form-label">Billing Head</label>
+ {{ formset.empty_form.service }}
+ </div>
+ <div class="form-group">
+ <label class="form-label">Document Type</label>
+ {{ formset.empty_form.doc_type }}
+ </div>
+ <div class="form-group">
+ <label class="form-label">File</label>
+ {{ formset.empty_form.file }}
+ </div>
+ <button type="button" class="btn btn-danger btn-sm remove-row"
+ style="margin-top: 0.5rem;">Remove</button>
+ </div>
+ </div>
 
-                        <p class="text-muted" style="font-size: 0.8rem;">Note: Documents will be uploaded directly to
-                            AWS S3 bucket.</p>
-                    </div>
-                </div>
-            </div>
+ <p class="text-muted" style="font-size: 0.8rem;">Note: Documents will be uploaded directly to
+ AWS S3 bucket.</p>
+ </div>
+ </div>
+ </div>
 
-            <div class="mt-6" style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <a href="{% url 'hospitals:dashboard' %}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">Submit Bill for Review</button>
-            </div>
-        </form>
+ <div class="mt-6" style="display: flex; gap: 1rem; justify-content: flex-end;">
+ <a href="{% url 'hospitals:dashboard' %}" class="btn btn-secondary">Cancel</a>
+ <button type="submit" class="btn btn-primary">Submit Bill for Review</button>
+ </div>
+ </form>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const addButton = document.getElementById('add-billing-head');
-                const headSelect = document.getElementById('billing-head-select');
-                const container = document.getElementById('formset-container');
-                const totalForms = document.getElementById('id_form-TOTAL_FORMS');
-                const emptyTemplate = document.getElementById('empty-form-template').innerHTML;
+ <script>
+ document.addEventListener('DOMContentLoaded', function() {
+ const addButton = document.getElementById('add-billing-head');
+ const headSelect = document.getElementById('billing-head-select');
+ const container = document.getElementById('formset-container');
+ const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+ const emptyTemplate = document.getElementById('empty-form-template').innerHTML;
 
-                addButton.addEventListener('click', function() {
-                    const selectedHeadId = headSelect.value;
-                    const selectedHeadText = headSelect.options[headSelect.selectedIndex].text;
+ addButton.addEventListener('click', function() {
+ const selectedHeadId = headSelect.value;
+ const selectedHeadText = headSelect.options[headSelect.selectedIndex].text;
 
-                    if (!selectedHeadId) {
-                        alert('Please select a Billing Head first.');
-                        return;
-                    }
+ if (!selectedHeadId) {
+ alert('Please select a Billing Head first.');
+ return;
+ }
 
-                    const currentIndex = parseInt(totalForms.value);
-                    const newRowHtml = emptyTemplate.replace(/__prefix__/g, currentIndex);
-                    
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = newRowHtml;
-                    const newRow = tempDiv.firstElementChild;
+ const currentIndex = parseInt(totalForms.value);
+ const newRowHtml = emptyTemplate.replace(/__prefix__/g, currentIndex);
+ 
+ const tempDiv = document.createElement('div');
+ tempDiv.innerHTML = newRowHtml;
+ const newRow = tempDiv.firstElementChild;
 
-                    // Set the service value and make it read-only or just visible
-                    const serviceSelect = newRow.querySelector('select[name$="-service"]');
-                    if (serviceSelect) {
-                        serviceSelect.value = selectedHeadId;
-                        // Prepend the selected text for clarity
-                        const label = newRow.querySelector('.form-label');
-                        if (label) {
-                            label.innerHTML = `Billing Head: <strong>${selectedHeadText}</strong>`;
-                        }
-                    }
+ // Set the service value and make it read-only or just visible
+ const serviceSelect = newRow.querySelector('select[name$="-service"]');
+ if (serviceSelect) {
+ serviceSelect.value = selectedHeadId;
+ // Prepend the selected text for clarity
+ const label = newRow.querySelector('.form-label');
+ if (label) {
+ label.innerHTML = `Billing Head: <strong>${selectedHeadText}</strong>`;
+ }
+ }
 
-                    container.appendChild(newRow);
-                    totalForms.value = currentIndex + 1;
+ container.appendChild(newRow);
+ totalForms.value = currentIndex + 1;
 
-                    // Add remove functionality
-                    newRow.querySelector('.remove-row').addEventListener('click', function() {
-                        newRow.remove();
-                        // Note: In a real app we might need to re-index, but for simple submission it usually works
-                        // if we don't care about gaps, or we can just decrement and hope for the best.
-                        // Better to keep totalForms accurate if we're submitting.
-                    });
-                });
-            });
-        </script>
-    </main>
+ // Add remove functionality
+ newRow.querySelector('.remove-row').addEventListener('click', function() {
+ newRow.remove();
+ // Note: In a real app we might need to re-index, but for simple submission it usually works
+ // if we don't care about gaps, or we can just decrement and hope for the best.
+ // Better to keep totalForms accurate if we're submitting.
+ });
+ });
+ });
+ </script>
+ </main>
 </div>
 {% endblock %}

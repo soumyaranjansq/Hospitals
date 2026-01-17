@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -14,23 +15,22 @@ def approval_queue(request):
     profile = request.user.profile
     role = profile.role
     
-    # Find the step that matches this role
-    step = WorkflowStep.objects.filter(role_name=role).first()
+    # Find ALL steps that match this role
+    steps = WorkflowStep.objects.filter(role_name=role)
     
-    if not step:
-        messages.warning(request, 'No workflow step configured for your role.')
+    if not steps.exists():
+        messages.warning(request, 'No workflow steps configured for your role.')
         return redirect('dashboard')
     
-    # Only show requests assigned to this specific user or NOT assigned yet (optional policy)
-    # Here we show ONLY assigned to this user to enforce allocation
+    # Show requests at ANY of these steps assigned to this user OR unassigned
     pending_requests = SanctionRequest.objects.filter(
-        current_step=step,
-        status__in=['PENDING', 'IN_PROGRESS'],
-        assigned_to=request.user
-    )
+        Q(assigned_to=request.user) | Q(assigned_to__isnull=True),
+        current_step__in=steps,
+        status__in=['PENDING', 'IN_PROGRESS']
+    ).order_by('created_at')
     
     return render(request, 'workflow/approval_queue.html', {
-        'step': step,
+        'step': steps.first(),
         'pending_requests': pending_requests,
     })
 
@@ -120,15 +120,21 @@ def process_request(request, request_id):
             approved_amount_at_stage=amount if amount else None,
         )
         
-        # Update request status based on action
+        # Update request and bill status based on action
         if action == 'APPROVE':
             sanction_request.status = 'APPROVED'
             sanction_request.sanctioned_amount = amount
+            # Update the linked bill as well
+            sanction_request.bill.status = 'APPROVED'
+            sanction_request.bill.save()
             messages.success(request, 'Request approved successfully.')
         elif action == 'REJECT':
+            # Actual rejection (Step 6 and 7)
             sanction_request.status = 'REJECTED'
+            sanction_request.bill.status = 'REJECTED'
+            sanction_request.bill.save()
             messages.warning(request, 'Request rejected.')
-        elif action == 'FORWARD':
+        elif action in ['FORWARD', 'REJECT_RECOMMENDED']:
             # Move to next step
             next_step = WorkflowStep.objects.filter(
                 order__gt=sanction_request.current_step.order
@@ -137,11 +143,22 @@ def process_request(request, request_id):
                 sanction_request.current_step = next_step
                 sanction_request.status = 'IN_PROGRESS'
                 sanction_request.assigned_to = None # Clear for re-allocation at next stage
-                messages.success(request, f'Request forwarded to {next_step.name}.')
+                # Update bill to Under Review if it wasn't already
+                if sanction_request.bill.status != 'UNDER_REVIEW':
+                    sanction_request.bill.status = 'UNDER_REVIEW'
+                    sanction_request.bill.save()
+                
+                msg = f'Request forwarded to {next_step.name}.'
+                if action == 'REJECT_RECOMMENDED':
+                    msg = f'Request forwarded to {next_step.name} with recommendation for rejection.'
+                messages.success(request, msg)
             else:
-                messages.error(request, 'No next step available.')
+                messages.error(request, 'No next step available. Please use "Approve Final" or "Reject".')
         elif action == 'CLARIFY':
             sanction_request.status = 'CLARIFICATION'
+            # Update the linked bill as well
+            sanction_request.bill.status = 'CLARIFICATION'
+            sanction_request.bill.save()
             messages.info(request, 'Clarification requested from hospital.')
         
         sanction_request.save()

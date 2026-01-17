@@ -60,12 +60,29 @@ TEMPLATES = [
 WSGI_APPLICATION = 'project.wsgi.application'
 
 # Database
-DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
-        conn_max_age=600
-    )
-}
+# Prefer Oracle if connection details are provided, otherwise fallback to DATABASE_URL or SQLite
+ORACLE_USER = os.environ.get('ORACLE_USER')
+ORACLE_PASSWORD = os.environ.get('ORACLE_PASSWORD')
+ORACLE_HOST = os.environ.get('ORACLE_HOST')
+ORACLE_PORT = os.environ.get('ORACLE_PORT', '1521')
+ORACLE_SERVICE_NAME = os.environ.get('ORACLE_SERVICE_NAME')
+
+if ORACLE_USER and ORACLE_PASSWORD and ORACLE_HOST and ORACLE_SERVICE_NAME:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.oracle',
+            'NAME': f"{ORACLE_HOST}:{ORACLE_PORT}/{ORACLE_SERVICE_NAME}",
+            'USER': ORACLE_USER,
+            'PASSWORD': ORACLE_PASSWORD,
+        }
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+            conn_max_age=600
+        )
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

@@ -52,8 +52,7 @@
                             </div>
                             <div>
                                 <p class="text-muted">Claimed Amount</p>
-                                <p style="font-size: 1.25rem; font-weight: 700; color: var(--primary-500);">₹{{
-                                    sanction_request.claimed_amount }}</p>
+                                <p style="font-size: 1.25rem; font-weight: 700; color: var(--primary-500);">₹{{ sanction_request.claimed_amount }}</p>
                             </div>
                             <div>
                                 <p class="text-muted">Current Step</p>
@@ -82,14 +81,26 @@
                                     placeholder="Enter your comments here..." required></textarea>
                             </div>
                             <div style="display: flex; gap: 1rem;">
-                                <button type="submit" name="action" value="FORWARD" class="btn btn-primary">Forward to
-                                    Next Level</button>
-                                <button type="submit" name="action" value="APPROVE" class="btn btn-primary"
-                                    style="background: var(--success-500);">Approve Final</button>
-                                <button type="submit" name="action" value="REJECT" class="btn btn-secondary"
-                                    style="background: var(--error-500); color: white;">Reject</button>
-                                <button type="submit" name="action" value="CLARIFY" class="btn btn-secondary">Seek
-                                    Clarification</button>
+                                {% if sanction_request.current_step.order <= 5 %} <button type="submit" name="action"
+                                    value="FORWARD" class="btn btn-primary">Submitted for Scrutiny</button>
+                                    <button type="submit" name="action" value="REJECT_RECOMMENDED"
+                                        class="btn btn-secondary"
+                                        style="background: var(--error-500); color: white;">Submitted for
+                                        Rejection</button>
+                                    {% elif sanction_request.current_step.order == 6 %}
+                                    <button type="submit" name="action" value="FORWARD" class="btn btn-primary"
+                                        style="background: var(--success-500);">Approve</button>
+                                    <button type="submit" name="action" value="REJECT" class="btn btn-secondary"
+                                        style="background: var(--error-500); color: white;">Reject</button>
+                                    {% elif sanction_request.current_step.order == 7 %}
+                                    <button type="submit" name="action" value="APPROVE" class="btn btn-primary"
+                                        style="background: var(--success-500);">Approve Final</button>
+                                    <button type="submit" name="action" value="REJECT" class="btn btn-secondary"
+                                        style="background: var(--error-500); color: white;">Reject</button>
+                                    {% endif %}
+
+                                    <button type="submit" name="action" value="CLARIFY" class="btn btn-secondary">Seek
+                                        Clarification</button>
                             </div>
                         </form>
                     </div>

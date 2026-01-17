@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.forms import modelformset_factory
 
 from accounts.decorators import role_required, hospital_required
-from .models import Hospital, Bill, BillDocument, Service
+from .models import Hospital, Bill, BillDocument, Service, Scheme
 from .forms import BillForm, BillDocumentForm
 from workflow.models import SanctionRequest, WorkflowStep
 
@@ -79,6 +79,7 @@ def submit_bill(request):
             messages.error(request, 'Please correct the errors below.')
     else:
         bill_form = BillForm()
+        bill_form.fields['scheme'].queryset = Scheme.objects.filter(is_active=True)
         formset = DocumentFormSet(queryset=BillDocument.objects.none())
         
     return render(request, 'hospitals/submit_bill.html', {
